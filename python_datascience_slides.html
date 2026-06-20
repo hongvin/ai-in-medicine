@@ -589,6 +589,15 @@
             margin-top: 48px;
             letter-spacing: 0.04em;
         }
+        .closing-url a {
+            color: var(--accent-teal);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(13, 148, 136, 0.3);
+            transition: border-color 0.2s;
+        }
+        .closing-url a:hover {
+            border-bottom-color: var(--accent-teal);
+        }
 
         /* ===========================================
            PAGE COUNTER & CONTROLS
@@ -951,7 +960,9 @@
                 <div class="closing-icon reveal">🚀</div>
                 <h2 class="closing-heading reveal">Let's Begin!</h2>
                 <p class="closing-sub reveal">Open your notebook. Let's write some Python.</p>
-                <div class="closing-url reveal">Google Colab: File → Open notebook</div>
+                <div class="closing-url reveal">
+                    <a href="https://colab.research.google.com/github/hongvin/ai-in-medicine/blob/main/python_datascience_course.ipynb" target="_blank">Open in Google Colab</a>
+                </div>
             </section>
 
         </main><!-- /.deck-stage -->
