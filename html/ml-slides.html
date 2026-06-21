@@ -118,6 +118,47 @@
         .closing-url a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(231,111,81,0.3); transition: border-color 0.2s; }
         .closing-url a:hover { border-bottom-color: var(--accent); }
 
+        /* Instructor Slide */
+        .slide-instructor {
+            display: flex;
+            align-items: center;
+            padding: 0 160px;
+            background: linear-gradient(135deg, #f9f7f4 0%, #f3f0eb 50%, #f0ece6 100%);
+        }
+        .instructor-avatar {
+            width: 280px; height: 280px; border-radius: 16px;
+            background: linear-gradient(135deg, var(--accent), #d65d3d);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 100px; margin-right: 80px; flex-shrink: 0;
+            box-shadow: 0 20px 60px rgba(231,111,81,0.15);
+        }
+        .instructor-info { display: flex; flex-direction: column; gap: 20px; }
+        .instructor-badge {
+            display: inline-block; font-family: var(--font-display);
+            font-size: 15px; font-weight: 600; letter-spacing: 0.12em;
+            text-transform: uppercase; color: var(--accent);
+            background: var(--accent-subtle); padding: 6px 18px;
+            border-radius: 4px; align-self: flex-start;
+        }
+        .instructor-name {
+            font-family: var(--font-display); font-size: 72px; font-weight: 800;
+            color: var(--text-dark); letter-spacing: -0.02em; line-height: 1.1;
+        }
+        .instructor-details {
+            font-family: var(--font-body); font-size: 26px;
+            color: var(--text-medium); line-height: 1.7;
+        }
+        .instructor-details .label {
+            font-family: var(--font-display); font-size: 18px; font-weight: 600;
+            color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em;
+        }
+        .instructor-details a {
+            color: var(--accent); text-decoration: none;
+            border-bottom: 1px solid rgba(231,111,81,0.3); transition: border-color 0.2s;
+        }
+        .instructor-details a:hover { border-bottom-color: var(--accent); }
+        .instructor-bar { width: 60px; height: 3px; background: var(--accent); margin: 8px 0 16px; }
+
         /* Grid pattern */
         .grid-pattern { position: absolute; right: 0; bottom: 0; width: 400px; height: 400px; opacity: 0.04; background-image: linear-gradient(var(--accent) 1px, transparent 1px), linear-gradient(90deg, var(--accent) 1px, transparent 1px); background-size: 40px 40px; }
 
@@ -144,7 +185,33 @@
                 </div>
             </section>
 
-            <!-- SLIDE 2 — WHAT IS ML -->
+            <!-- SLIDE 2 — ABOUT THE INSTRUCTOR -->
+            <section class="slide slide-instructor" id="slide-instructor">
+                <div class="grid-pattern"></div>
+                <div class="instructor-avatar reveal">🧑‍💻</div>
+                <div class="instructor-info">
+                    <span class="instructor-badge reveal">Your Instructor</span>
+                    <h2 class="instructor-name reveal">Koay Hong Vin</h2>
+                    <div class="instructor-bar reveal"></div>
+                    <div class="instructor-details reveal">
+                        <span class="label">Education</span><br>
+                        B.Eng. Electrical Engineering<br>
+                        PhD in Artificial Intelligence &mdash; Autonomous Vehicles
+                    </div>
+                    <div class="instructor-details reveal">
+                        <span class="label">Current</span><br>
+                        Risk Modelling and Data Scientist<br>
+                        Ant International
+                    </div>
+                    <div class="instructor-details reveal">
+                        <span class="label">Links</span><br>
+                        <a href="https://linkedin.com/in/koayhv" target="_blank">linkedin.com/in/koayhv</a><br>
+                        <a href="https://hongvin.me" target="_blank">hongvin.me</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 3 — WHAT IS ML -->
             <section class="slide slide-content-slide" id="slide-2">
                 <div class="grid-pattern"></div>
                 <div class="slide-number reveal">01 / Concept</div>
@@ -229,7 +296,7 @@
             <!-- SLIDE 5A — OVERFITTING -->
             <section class="slide slide-content-slide" id="slide-overfit">
                 <div class="grid-pattern"></div>
-                <div class="slide-number reveal">05 / Pitfalls</div>
+                <div class="slide-number reveal">05 / Overfitting</div>
                 <h2 class="slide-heading reveal"><span class="accent">Overfitting</span> vs Underfitting</h2>
                 <div class="cards-row" style="margin-top: 16px;">
                     <div class="feature-card reveal">
@@ -258,7 +325,7 @@
             <!-- SLIDE 6 — TREES & FOREST -->
             <section class="slide slide-content-slide" id="slide-6">
                 <div class="grid-pattern"></div>
-                <div class="slide-number reveal">05 / Trees</div>
+                <div class="slide-number reveal">06 / Trees</div>
                 <h2 class="slide-heading reveal">Decision Trees & <span class="accent">Random Forest</span></h2>
                 <div class="two-col">
                     <div class="col-left">
@@ -315,7 +382,7 @@
             <!-- SLIDE 7 — REGRESSION -->
             <section class="slide slide-content-slide" id="slide-7">
                 <div class="grid-pattern"></div>
-                <div class="slide-number reveal">06 / Regression</div>
+                <div class="slide-number reveal">08 / Regression</div>
                 <h2 class="slide-heading reveal">Linear Regression — <span class="accent">Predict a Number</span></h2>
                 <ul class="bullet-list">
                     <li class="reveal"><strong>Dataset: Diabetes</strong> — 442 patients, 10 baseline variables → predict disease progression after 1 year</li>
@@ -328,7 +395,7 @@
             <!-- SLIDE 8 — DATASETS -->
             <section class="slide slide-content-slide" id="slide-8">
                 <div class="grid-pattern"></div>
-                <div class="slide-number reveal">07 / Datasets</div>
+                <div class="slide-number reveal">09 / Datasets</div>
                 <h2 class="slide-heading reveal">Our <span class="accent">Biomedical</span> Datasets</h2>
                 <div class="cards-row" style="margin-top: 16px;">
                     <div class="feature-card reveal">
@@ -357,7 +424,7 @@
             <!-- SLIDE 8A — INTERPRETATION & PITFALLS -->
             <section class="slide slide-content-slide" id="slide-interp">
                 <div class="grid-pattern"></div>
-                <div class="slide-number reveal">09 / Insight</div>
+                <div class="slide-number reveal">10 / Insight</div>
                 <h2 class="slide-heading reveal">Model <span class="accent">Interpretation</span> & Common Pitfalls</h2>
                 <ul class="bullet-list">
                     <li class="reveal"><strong>Feature importance</strong> — random forests tell you which biomarkers matter most. This is often more valuable than the prediction itself.</li>
@@ -372,7 +439,7 @@
             <!-- SLIDE 9 — HOW WE'LL WORK -->
             <section class="slide slide-content-slide" id="slide-9">
                 <div class="grid-pattern"></div>
-                <div class="slide-number reveal">08 / Setup</div>
+                <div class="slide-number reveal">11 / Setup</div>
                 <h2 class="slide-heading reveal">How We'll <span class="accent">Work</span></h2>
                 <div class="cards-row" style="margin-top: 16px;">
                     <div class="feature-card reveal">
@@ -401,7 +468,7 @@
             <!-- SLIDE 10 — KEY CONCEPTS -->
             <section class="slide slide-content-slide" id="slide-10">
                 <div class="grid-pattern"></div>
-                <div class="slide-number reveal">09 / Recap</div>
+                <div class="slide-number reveal">12 / Recap</div>
                 <h2 class="slide-heading reveal">The <span class="accent">ML Pipeline</span></h2>
                 <div style="display: flex; gap: 60px; align-items: flex-start; margin-top: 20px;">
                     <div class="stat-block" style="flex-direction: column; gap: 40px;">
@@ -439,7 +506,7 @@
     </div>
 
     <div class="deck-controls">
-        <span class="page-counter" id="pageCounter">1 / 14</span>
+        <span class="page-counter" id="pageCounter">1 / 15</span>
     </div>
 
     <script>
