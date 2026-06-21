@@ -226,6 +226,35 @@
                 </div>
             </section>
 
+            <!-- SLIDE 5A — OVERFITTING -->
+            <section class="slide slide-content-slide" id="slide-overfit">
+                <div class="grid-pattern"></div>
+                <div class="slide-number reveal">05 / Pitfalls</div>
+                <h2 class="slide-heading reveal"><span class="accent">Overfitting</span> vs Underfitting</h2>
+                <div class="cards-row" style="margin-top: 16px;">
+                    <div class="feature-card reveal">
+                        <div class="feature-card-icon">📉</div>
+                        <div class="feature-card-title">Underfitting</div>
+                        <div class="feature-card-desc">Model is too simple. Misses real patterns in the data. High bias, poor performance on both train and test sets.</div>
+                    </div>
+                    <div class="feature-card reveal">
+                        <div class="feature-card-icon">🎯</div>
+                        <div class="feature-card-title">Just Right</div>
+                        <div class="feature-card-desc">Model captures genuine patterns without memorizing noise. Good generalization — performs well on unseen data.</div>
+                    </div>
+                    <div class="feature-card reveal">
+                        <div class="feature-card-icon">⚠️</div>
+                        <div class="feature-card-title">Overfitting</div>
+                        <div class="feature-card-desc">Model is too complex. Memorizes training data including noise. Great on training, terrible on test. The most common ML mistake.</div>
+                    </div>
+                    <div class="feature-card reveal">
+                        <div class="feature-card-icon">💊</div>
+                        <div class="feature-card-title">In Medicine</div>
+                        <div class="feature-card-desc">An overfit model might learn that "patients with ID #47 all have cancer" — a coincidence, not a pattern. Devastating in clinical use.</div>
+                    </div>
+                </div>
+            </section>
+
             <!-- SLIDE 6 — TREES & FOREST -->
             <section class="slide slide-content-slide" id="slide-6">
                 <div class="grid-pattern"></div>
@@ -249,6 +278,35 @@
                             rf.<span class="fn">fit</span>(X_train, y_train)<br><br>
                             <span class="cmt"># Which features matter?</span><br>
                             rf.feature_importances_
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 6A — CROSS-VALIDATION -->
+            <section class="slide slide-content-slide" id="slide-crossval">
+                <div class="grid-pattern"></div>
+                <div class="slide-number reveal">07 / Validation</div>
+                <h2 class="slide-heading reveal"><span class="accent">Cross-Validation</span> — Trust but Verify</h2>
+                <div class="two-col">
+                    <div class="col-left">
+                        <ul class="bullet-list">
+                            <li class="reveal"><strong>One split isn't enough</strong> — a single train/test split can be lucky (or unlucky). Cross-validation fixes this.</li>
+                            <li class="reveal"><strong>K-fold CV</strong> — split data into K parts. Train on K-1, test on 1. Repeat K times. Average the scores.</li>
+                            <li class="reveal"><strong>Typical K = 5 or 10</strong> — gives a robust estimate of real-world performance.</li>
+                            <li class="reveal"><strong>In medicine</strong> — always report CV scores, not just one split. It shows whether your model is stable.</li>
+                        </ul>
+                    </div>
+                    <div class="col-right">
+                        <div class="code-mini reveal">
+                            <span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> cross_val_score<br><br>
+                            rf = RandomForestClassifier()<br>
+                            scores = cross_val_score(<br>
+                            &nbsp;&nbsp;rf, X, y, cv=<span class="num">5</span><br>
+                            )<br><br>
+                            <span class="cmt"># 5 scores, one per fold</span><br>
+                            scores  <span class="cmt"># eg [0.96, 0.98, 0.95, ...]</span><br>
+                            scores.<span class="fn">mean</span>()  <span class="cmt"># robust estimate</span>
                         </div>
                     </div>
                 </div>
@@ -294,6 +352,21 @@
                         <div class="feature-card-desc">These are the same datasets used in ML textbooks and research papers worldwide. You're learning on real, published data.</div>
                     </div>
                 </div>
+            </section>
+
+            <!-- SLIDE 8A — INTERPRETATION & PITFALLS -->
+            <section class="slide slide-content-slide" id="slide-interp">
+                <div class="grid-pattern"></div>
+                <div class="slide-number reveal">09 / Insight</div>
+                <h2 class="slide-heading reveal">Model <span class="accent">Interpretation</span> & Common Pitfalls</h2>
+                <ul class="bullet-list">
+                    <li class="reveal"><strong>Feature importance</strong> — random forests tell you which biomarkers matter most. This is often more valuable than the prediction itself.</li>
+                    <li class="reveal"><strong>Coefficients</strong> — in logistic/linear regression, each coefficient says: "for every 1-unit increase in X, outcome changes by Y"</li>
+                    <li class="reveal"><strong>Data leakage</strong> — accidentally using future information to predict the past. Example: scaling BEFORE splitting.</li>
+                    <li class="reveal"><strong>Class imbalance</strong> — 99% benign, 1% malignant? A model that says "always benign" gets 99% accuracy but is clinically useless.</li>
+                    <li class="reveal"><strong>Correlation ≠ causation</strong> — the model found that ice cream sales predict drownings. Doesn't mean ice cream causes drowning.</li>
+                    <li class="reveal"><strong>Always ask</strong>: Would I trust this model with a patient's life? If not, what would make you trust it?</li>
+                </ul>
             </section>
 
             <!-- SLIDE 9 — HOW WE'LL WORK -->
@@ -366,7 +439,7 @@
     </div>
 
     <div class="deck-controls">
-        <span class="page-counter" id="pageCounter">1 / 11</span>
+        <span class="page-counter" id="pageCounter">1 / 14</span>
     </div>
 
     <script>
