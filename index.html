@@ -3,198 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI in Medicine — Python for Data Science</title>
-
-    <!-- Fonts: Outfit (geometric modern) + Source Serif 4 (scholarly readable) -->
+    <title>AI in Medicine — Summer Course 2026</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
-
     <style>
-        /* ===========================================
-           CSS CUSTOM PROPERTIES — Academic Teal Theme
-           Change --accent to recolor the entire deck
-           =========================================== */
         :root {
             --bg-cream: #f9f7f4;
-            --bg-warm: #f3f0eb;
             --text-dark: #1e293b;
             --text-medium: #475569;
             --text-light: #94a3b8;
             --accent-teal: #0d9488;
-            --accent-teal-subtle: rgba(13, 148, 136, 0.08);
+            --accent-teal-subtle: rgba(13,148,136,0.08);
             --accent-coral: #e76f51;
-            --accent-gold: #b8860b;
             --white: #ffffff;
-            --border-subtle: rgba(30, 41, 59, 0.08);
+            --border-subtle: rgba(30,41,59,0.08);
             --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-
             --font-display: 'Outfit', sans-serif;
             --font-body: 'Source Serif 4', Georgia, serif;
-            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-            --duration-normal: 0.7s;
-            --duration-fast: 0.4s;
         }
 
-        /* ===========================================
-           RESET
-           =========================================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* ===========================================
-           FIXED 16:9 STAGE: MANDATORY BASE STYLES
-           from viewport-base.css
-           =========================================== */
-
-        /* 1. Lock the browser viewport */
-        html, body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            overflow: hidden;
-            background: var(--bg-cream);
-        }
-
-        /* 2. Full-window deck viewport */
-        .deck-viewport {
-            position: fixed;
-            inset: 0;
-            overflow: hidden;
-            background: var(--bg-cream);
-        }
-
-        /* 3. Fixed 16:9 design canvas */
-        .deck-stage {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 1920px;
-            height: 1080px;
-            overflow: hidden;
-            transform-origin: 0 0;
-            background: var(--bg-cream);
-        }
-
-        /* 4. Slides stack inside the fixed stage */
-        .slide {
-            position: absolute;
-            inset: 0;
-            width: 1920px;
-            height: 1080px;
-            overflow: hidden;
-            display: block;
-            visibility: hidden;
-            opacity: 0;
-            pointer-events: none;
-            background: var(--bg-cream);
-        }
-
-        .slide.active,
-        .slide.visible {
-            visibility: visible;
-            opacity: 1;
-            pointer-events: auto;
-            z-index: 1;
-        }
-
-        /* 5. Keep media inside authored slide bounds */
-        img, video, canvas, svg {
-            max-width: 100%;
-            max-height: 100%;
-        }
-
-        /* 6. Presentation chrome stays outside the slide design system */
-        .deck-controls {
-            position: fixed;
-            left: 50%;
-            bottom: 28px;
-            transform: translateX(-50%);
-            z-index: 1000;
-        }
-
-        /* 7. Print one fixed-size slide per page */
-        @media print {
-            html, body { width: 1920px; height: auto; overflow: visible; background: #fff; }
-            .deck-viewport { position: static; overflow: visible; background: #fff; }
-            .deck-stage { position: static; width: auto; height: auto; transform: none !important; background: none; }
-            .slide {
-                position: relative; display: block !important; visibility: visible !important;
-                opacity: 1 !important; pointer-events: auto !important; width: 1920px; height: 1080px;
-                break-after: page; page-break-after: always;
-            }
-            .slide:last-child { break-after: auto; page-break-after: auto; }
-            .deck-controls { display: none !important; }
-        }
-
-        /* 8. Reduced motion */
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                transition-duration: 0.2s !important;
-            }
-        }
-
-        /* ===========================================
-           ANIMATION SYSTEM
-           =========================================== */
-        .reveal {
-            opacity: 0;
-            transform: translateY(32px);
-            transition: opacity var(--duration-normal) var(--ease-out-expo),
-                        transform var(--duration-normal) var(--ease-out-expo);
-        }
-        .slide.visible .reveal {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .reveal:nth-child(1) { transition-delay: 0.05s; }
-        .reveal:nth-child(2) { transition-delay: 0.12s; }
-        .reveal:nth-child(3) { transition-delay: 0.19s; }
-        .reveal:nth-child(4) { transition-delay: 0.26s; }
-        .reveal:nth-child(5) { transition-delay: 0.33s; }
-        .reveal:nth-child(6) { transition-delay: 0.40s; }
-        .reveal:nth-child(7) { transition-delay: 0.47s; }
-        .reveal:nth-child(8) { transition-delay: 0.54s; }
-
-        .reveal-left {
-            opacity: 0;
-            transform: translateX(-40px);
-            transition: opacity var(--duration-normal) var(--ease-out-expo),
-                        transform var(--duration-normal) var(--ease-out-expo);
-        }
-        .slide.visible .reveal-left {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        .reveal-left:nth-child(1) { transition-delay: 0.08s; }
-        .reveal-left:nth-child(2) { transition-delay: 0.18s; }
-        .reveal-left:nth-child(3) { transition-delay: 0.28s; }
-        .reveal-left:nth-child(4) { transition-delay: 0.38s; }
-
-        /* ===========================================
-           SLIDE CONTENT STYLES
-           =========================================== */
-
-        /* --- Title Slide --- */
-        .slide-title {
+        body {
+            font-family: var(--font-body);
+            background: linear-gradient(135deg, #f9f7f4 0%, #f3f0eb 30%, #f0ece6 70%, #f9f7f4 100%);
+            min-height: 100vh;
             display: flex;
             align-items: center;
-            padding: 0 160px;
-            background:
-                linear-gradient(135deg, #f9f7f4 0%, #f3f0eb 30%, #f9f7f4 60%, #f0ece6 100%);
+            justify-content: center;
+            padding: 40px 20px;
         }
-        .title-accent-bar {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 8px;
-            height: 100%;
-            background: linear-gradient(180deg, var(--accent-teal), #0891b2, var(--accent-teal));
+
+        .container {
+            max-width: 960px;
+            width: 100%;
+            text-align: center;
         }
-        .title-badge {
+
+        .badge {
             display: inline-block;
             font-family: var(--font-display);
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             letter-spacing: 0.12em;
             text-transform: uppercase;
@@ -202,993 +52,205 @@
             background: var(--accent-teal-subtle);
             padding: 8px 20px;
             border-radius: 4px;
-            margin-bottom: 32px;
+            margin-bottom: 20px;
         }
-        .title-main {
+
+        h1 {
             font-family: var(--font-display);
-            font-size: 96px;
+            font-size: clamp(40px, 6vw, 72px);
             font-weight: 800;
-            line-height: 1.05;
             color: var(--text-dark);
             letter-spacing: -0.02em;
-            max-width: 1200px;
+            line-height: 1.1;
         }
-        .title-sub {
+
+        .subtitle {
             font-family: var(--font-body);
-            font-size: 34px;
-            font-weight: 400;
+            font-size: clamp(18px, 2.5vw, 26px);
             color: var(--text-medium);
-            line-height: 1.4;
-            margin-top: 24px;
             font-style: italic;
+            margin-top: 16px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
-        .title-meta {
+
+        .meta {
             display: flex;
-            gap: 40px;
-            margin-top: 48px;
+            gap: 32px;
+            justify-content: center;
+            margin-top: 28px;
             font-family: var(--font-display);
-            font-size: 18px;
+            font-size: 15px;
             font-weight: 500;
             color: var(--text-light);
             letter-spacing: 0.05em;
+            flex-wrap: wrap;
         }
-        .title-meta span {
+        .meta span {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
-        .title-meta-dot {
-            width: 6px;
-            height: 6px;
+        .meta-dot {
+            width: 5px;
+            height: 5px;
             border-radius: 50%;
             background: var(--accent-teal);
         }
-        .title-geo {
-            position: absolute;
-            right: 120px;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: 0.06;
-        }
 
-        /* --- Agenda / Content Slides --- */
-        .slide-content-slide {
-            display: flex;
-            flex-direction: column;
-            padding: 100px 160px 80px;
-        }
-        .slide-number {
-            font-family: var(--font-display);
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: var(--accent-teal);
-            margin-bottom: 16px;
-        }
-        .slide-heading {
-            font-family: var(--font-display);
-            font-size: 64px;
-            font-weight: 700;
-            color: var(--text-dark);
-            letter-spacing: -0.015em;
-            line-height: 1.1;
-            margin-bottom: 48px;
-        }
-        .slide-heading .accent {
-            color: var(--accent-teal);
-        }
-
-        /* --- Agenda List --- */
-        .agenda-grid {
+        .cards {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 24px 80px;
-            max-width: 1400px;
-        }
-        .agenda-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 20px;
-            padding: 20px 0;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-        .agenda-num {
-            font-family: var(--font-display);
-            font-size: 42px;
-            font-weight: 800;
-            color: var(--accent-teal);
-            min-width: 56px;
-            line-height: 1;
-        }
-        .agenda-text {
-            font-family: var(--font-display);
-        }
-        .agenda-title {
-            font-size: 26px;
-            font-weight: 600;
-            color: var(--text-dark);
-            line-height: 1.3;
-        }
-        .agenda-time {
-            font-size: 15px;
-            font-weight: 500;
-            color: var(--text-light);
-            letter-spacing: 0.04em;
-            margin-top: 4px;
+            gap: 28px;
+            margin-top: 56px;
         }
 
-        /* --- Feature Cards --- */
-        .cards-row {
-            display: flex;
-            gap: 32px;
-            max-width: 1520px;
+        @media (max-width: 640px) {
+            .cards { grid-template-columns: 1fr; }
         }
-        .feature-card {
-            flex: 1;
+
+        .card {
             background: var(--white);
             border: 1px solid var(--border-subtle);
-            border-radius: 8px;
-            padding: 40px 36px;
+            border-radius: 12px;
+            padding: 44px 36px;
+            text-align: left;
             box-shadow: var(--shadow-card);
+            transition: box-shadow 0.25s, transform 0.25s;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
         }
-        .feature-card-icon {
-            font-size: 40px;
+        .card:hover {
+            box-shadow: 0 8px 30px rgba(13,148,136,0.1);
+            transform: translateY(-2px);
+        }
+
+        .card-icon {
+            font-size: 48px;
             margin-bottom: 20px;
-            line-height: 1;
         }
-        .feature-card-title {
+        .card-num {
             font-family: var(--font-display);
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 12px;
-        }
-        .feature-card-desc {
-            font-family: var(--font-body);
-            font-size: 18px;
-            color: var(--text-medium);
-            line-height: 1.5;
-        }
-
-        /* --- Code Block --- */
-        .code-mini {
-            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
-            background: #1e293b;
-            color: #e2e8f0;
-            padding: 32px 36px;
-            border-radius: 8px;
-            font-size: 20px;
-            line-height: 1.7;
-            margin-top: 32px;
-            max-width: 1100px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.12);
-        }
-        .code-mini .kw { color: #93c5fd; }
-        .code-mini .fn { color: #f9a8d4; }
-        .code-mini .str { color: #86efac; }
-        .code-mini .num { color: #fdba74; }
-        .code-mini .cmt { color: #64748b; }
-
-        /* --- Big Stat / Highlight --- */
-        .stat-block {
-            display: flex;
-            gap: 80px;
-            margin-top: 24px;
-        }
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-        }
-        .stat-value {
-            font-family: var(--font-display);
-            font-size: 72px;
-            font-weight: 800;
-            color: var(--accent-teal);
-            line-height: 1;
-        }
-        .stat-label {
-            font-family: var(--font-body);
-            font-size: 20px;
-            color: var(--text-medium);
-            margin-top: 8px;
-            font-style: italic;
-        }
-
-        /* --- Two-Column Layout --- */
-        .two-col {
-            display: flex;
-            gap: 80px;
-            max-width: 1520px;
-        }
-        .col-left, .col-right {
-            flex: 1;
-        }
-        .col-right {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* --- Bullet List --- */
-        .bullet-list {
-            list-style: none;
-            font-family: var(--font-body);
-            font-size: 24px;
-            color: var(--text-medium);
-            line-height: 1.8;
-            max-width: 1100px;
-        }
-        .bullet-list li {
-            padding-left: 36px;
-            position: relative;
-            margin-bottom: 16px;
-        }
-        .bullet-list li::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 14px;
-            width: 14px;
-            height: 14px;
-            border-radius: 3px;
-            background: var(--accent-teal);
-            opacity: 0.6;
-        }
-        .bullet-list li strong {
-            font-family: var(--font-display);
-            color: var(--text-dark);
-            font-weight: 600;
-        }
-
-        /* --- Visual Block (decorative) --- */
-        .vis-block {
-            width: 440px;
-            height: 440px;
-            border-radius: 16px;
-            background:
-                linear-gradient(135deg, var(--accent-teal), #0891b2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 20px 60px rgba(13, 148, 136, 0.2);
-        }
-        .vis-block-inner {
-            font-family: var(--font-display);
-            font-size: 120px;
-            font-weight: 800;
-            color: rgba(255,255,255,0.9);
-            line-height: 1;
-        }
-
-        /* --- Grid Pattern Decoration --- */
-        .grid-pattern {
-            position: absolute;
-            right: 0;
-            bottom: 0;
-            width: 400px;
-            height: 400px;
-            opacity: 0.04;
-            background-image:
-                linear-gradient(var(--accent-teal) 1px, transparent 1px),
-                linear-gradient(90deg, var(--accent-teal) 1px, transparent 1px);
-            background-size: 40px 40px;
-        }
-
-        /* --- Instructor Slide --- */
-        .slide-instructor {
-            display: flex;
-            align-items: center;
-            padding: 0 160px;
-            background:
-                linear-gradient(135deg, #f9f7f4 0%, #f3f0eb 50%, #f0ece6 100%);
-        }
-        .instructor-avatar {
-            width: 280px;
-            height: 280px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, var(--accent-teal), #0891b2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 100px;
-            margin-right: 80px;
-            flex-shrink: 0;
-            box-shadow: 0 20px 60px rgba(13, 148, 136, 0.15);
-        }
-        .instructor-info {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .instructor-badge {
-            display: inline-block;
-            font-family: var(--font-display);
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 600;
             letter-spacing: 0.12em;
             text-transform: uppercase;
             color: var(--accent-teal);
-            background: var(--accent-teal-subtle);
-            padding: 6px 18px;
-            border-radius: 4px;
-            align-self: flex-start;
+            margin-bottom: 8px;
         }
-        .instructor-name {
+        .card-title {
             font-family: var(--font-display);
-            font-size: 72px;
-            font-weight: 800;
+            font-size: 28px;
+            font-weight: 700;
             color: var(--text-dark);
-            letter-spacing: -0.02em;
-            line-height: 1.1;
+            letter-spacing: -0.01em;
+            margin-bottom: 12px;
         }
-        .instructor-details {
+        .card-desc {
             font-family: var(--font-body);
-            font-size: 26px;
+            font-size: 16px;
             color: var(--text-medium);
-            line-height: 1.7;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            flex: 1;
         }
-        .instructor-details .label {
-            font-family: var(--font-display);
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--accent-teal);
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
-        .instructor-details a {
-            color: var(--accent-teal);
-            text-decoration: none;
-            border-bottom: 1px solid rgba(13, 148, 136, 0.3);
-            transition: border-color 0.2s;
-        }
-        .instructor-details a:hover {
-            border-bottom-color: var(--accent-teal);
-        }
-        .instructor-bar {
-            width: 60px;
-            height: 3px;
-            background: var(--accent-teal);
-            margin: 8px 0 16px;
-        }
-
-        /* --- Closing Slide --- */
-        .slide-closing {
+        .card-topics {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            background:
-                linear-gradient(135deg, #f0ece6 0%, #f9f7f4 40%, #f3f0eb 70%, #f9f7f4 100%);
+            flex-wrap: wrap;
+            gap: 8px;
         }
-        .closing-icon {
-            font-size: 80px;
-            margin-bottom: 40px;
-            opacity: 0.9;
-        }
-        .closing-heading {
+        .card-tag {
             font-family: var(--font-display);
-            font-size: 80px;
-            font-weight: 800;
-            color: var(--text-dark);
-            letter-spacing: -0.02em;
-        }
-        .closing-sub {
-            font-family: var(--font-body);
-            font-size: 30px;
-            color: var(--text-medium);
-            font-style: italic;
-            margin-top: 20px;
-        }
-        .closing-url {
-            font-family: var(--font-display);
-            font-size: 22px;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: var(--accent-teal-subtle);
             color: var(--accent-teal);
-            font-weight: 600;
-            margin-top: 48px;
-            letter-spacing: 0.04em;
         }
-        .closing-url a {
+
+        .card-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-display);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--white);
+            background: var(--accent-teal);
+            border: none;
+            border-radius: 8px;
+            padding: 14px 28px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+        .card-btn:hover { background: #0f766e; }
+        .card-btn.secondary {
+            background: var(--accent-coral);
+        }
+        .card-btn.secondary:hover { background: #d65d3d; }
+
+        footer {
+            margin-top: 48px;
+            font-family: var(--font-display);
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        footer a {
             color: var(--accent-teal);
             text-decoration: none;
-            border-bottom: 1px solid rgba(13, 148, 136, 0.3);
-            transition: border-color 0.2s;
-        }
-        .closing-url a:hover {
-            border-bottom-color: var(--accent-teal);
-        }
-
-        /* ===========================================
-           PAGE COUNTER & CONTROLS
-           =========================================== */
-        .page-counter {
-            font-family: var(--font-display);
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-light);
-            letter-spacing: 0.08em;
-            background: var(--white);
-            padding: 8px 18px;
-            border-radius: 20px;
-            border: 1px solid var(--border-subtle);
-            box-shadow: var(--shadow-card);
-        }
-
-        /* ===========================================
-           INLINE EDITING (hidden by default)
-           =========================================== */
-        .edit-hotzone {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 80px;
-            height: 80px;
-            z-index: 10000;
-            cursor: pointer;
-        }
-        .edit-toggle {
-            position: fixed;
-            top: 16px;
-            left: 16px;
-            background: var(--white);
-            border: 1px solid var(--border-subtle);
-            border-radius: 8px;
-            padding: 8px 14px;
-            font-size: 18px;
-            cursor: pointer;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-            z-index: 10001;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-        }
-        .edit-toggle.show,
-        .edit-toggle.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        [contenteditable]:focus {
-            outline: 2px solid var(--accent-teal);
-            outline-offset: 4px;
-            border-radius: 4px;
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <div class="badge">Summer Course 2026 · 27 July 2026</div>
+        <h1>AI in Medicine</h1>
+        <p class="subtitle">A hands-on workshop series for biomedical professionals — from Python fundamentals to machine learning</p>
+        <div class="meta">
+            <span><span class="meta-dot"></span> 1400–1715</span>
+            <span><span class="meta-dot"></span> Beginner to Intermediate</span>
+            <span><span class="meta-dot"></span> Google Colab</span>
+        </div>
 
-    <!-- ============================================
-    DECK VIEWPORT — scales the fixed stage to fit
-    ============================================ -->
-    <div class="deck-viewport" id="deckViewport">
-        <main class="deck-stage" id="deckStage">
-
-            <!-- ========================================
-            SLIDE 1 — TITLE
-            ======================================== -->
-            <section class="slide slide-title active" id="slide-1">
-                <div class="title-accent-bar"></div>
-                <div class="grid-pattern"></div>
-                <div>
-                    <div class="title-badge reveal">AI in Medicine — Summer Course 2026</div>
-                    <h1 class="title-main reveal">Python for<br>Data Science</h1>
-                    <p class="title-sub reveal">A hands-on workshop for biomedical professionals —<br>from zero to real data analysis in 3 hours</p>
-                    <div class="title-meta reveal">
-                        <span><span class="title-meta-dot"></span> 27 July 2026</span>
-                        <span><span class="title-meta-dot"></span> 1400–1715</span>
-                        <span><span class="title-meta-dot"></span> Google Colab</span>
-                    </div>
+        <div class="cards">
+            <a href="python-datascience.html" class="card">
+                <div class="card-num">Workshop 1</div>
+                <div class="card-icon">🐍</div>
+                <div class="card-title">Python for Data Science</div>
+                <div class="card-desc">Learn NumPy, Pandas, Matplotlib &amp; SciPy through real Malaysian birth data. From zero coding to publication-ready figures in one session.</div>
+                <div class="card-topics">
+                    <span class="card-tag">NumPy</span>
+                    <span class="card-tag">Pandas</span>
+                    <span class="card-tag">Matplotlib</span>
+                    <span class="card-tag">Statistics</span>
                 </div>
-            </section>
+                <span class="card-btn">Open Slides →</span>
+            </a>
 
-            <!-- ========================================
-            SLIDE 2 — ABOUT THE INSTRUCTOR
-            ======================================== -->
-            <section class="slide slide-instructor" id="slide-2">
-                <div class="grid-pattern"></div>
-                <div class="instructor-avatar reveal">🧑‍💻</div>
-                <div class="instructor-info">
-                    <span class="instructor-badge reveal">Your Instructor</span>
-                    <h2 class="instructor-name reveal">Koay Hong Vin</h2>
-                    <div class="instructor-bar reveal"></div>
-                    <div class="instructor-details reveal">
-                        <span class="label">Education</span><br>
-                        B.Eng. Electrical Engineering<br>
-                        PhD in Artificial Intelligence &mdash; Autonomous Vehicles
-                    </div>
-                    <div class="instructor-details reveal">
-                        <span class="label">Current</span><br>
-                        Risk Modelling and Data Scientist<br>
-                        Ant International
-                    </div>
-                    <div class="instructor-details reveal">
-                        <span class="label">Links</span><br>
-                        <a href="https://linkedin.com/in/koayhv" target="_blank">linkedin.com/in/koayhv</a><br>
-                        <a href="https://hongvin.me" target="_blank">hongvin.me</a>
-                    </div>
+            <a href="ml-slides.html" class="card">
+                <div class="card-num">Workshop 2</div>
+                <div class="card-icon">🤖</div>
+                <div class="card-title">Conventional Machine Learning</div>
+                <div class="card-desc">Build, evaluate and interpret ML models with scikit-learn. Classification, regression, and model evaluation using real biomedical datasets.</div>
+                <div class="card-topics">
+                    <span class="card-tag">Classification</span>
+                    <span class="card-tag">Regression</span>
+                    <span class="card-tag">scikit-learn</span>
+                    <span class="card-tag">Evaluation</span>
                 </div>
-            </section>
+                <span class="card-btn secondary">Open Slides →</span>
+            </a>
+        </div>
 
-            <!-- ========================================
-            SLIDE 3 — AGENDA
-            ======================================== -->
-            <section class="slide slide-content-slide" id="slide-3">
-                <div class="grid-pattern"></div>
-                <div class="slide-number reveal">01 / Agenda</div>
-                <h2 class="slide-heading reveal">What We'll Cover <span class="accent">Today</span></h2>
-                <div class="agenda-grid">
-                    <div class="agenda-item reveal">
-                        <span class="agenda-num">01</span>
-                        <div class="agenda-text">
-                            <div class="agenda-title">Quick Start & Python Refresher</div>
-                            <div class="agenda-time">~15 min</div>
-                        </div>
-                    </div>
-                    <div class="agenda-item reveal">
-                        <span class="agenda-num">02</span>
-                        <div class="agenda-text">
-                            <div class="agenda-title">NumPy Essentials</div>
-                            <div class="agenda-time">~20 min</div>
-                        </div>
-                    </div>
-                    <div class="agenda-item reveal">
-                        <span class="agenda-num">03</span>
-                        <div class="agenda-text">
-                            <div class="agenda-title">Pandas Fundamentals</div>
-                            <div class="agenda-time">~40 min</div>
-                        </div>
-                    </div>
-                    <div class="agenda-item reveal">
-                        <span class="agenda-num">04</span>
-                        <div class="agenda-text">
-                            <div class="agenda-title">Data Visualization</div>
-                            <div class="agenda-time">~25 min</div>
-                        </div>
-                    </div>
-                    <div class="agenda-item reveal">
-                        <span class="agenda-num">05</span>
-                        <div class="agenda-text">
-                            <div class="agenda-title">Mini Project: Malaysia Births</div>
-                            <div class="agenda-time">~50 min</div>
-                        </div>
-                    </div>
-                    <div class="agenda-item reveal">
-                        <span class="agenda-num">06</span>
-                        <div class="agenda-text">
-                            <div class="agenda-title">Wrap-up & Next Steps</div>
-                            <div class="agenda-time">~10 min</div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ========================================
-            SLIDE 4 — WHY PYTHON
-            ======================================== -->
-            <section class="slide slide-content-slide" id="slide-4">
-                <div class="grid-pattern"></div>
-                <div class="slide-number reveal">02 / Context</div>
-                <h2 class="slide-heading reveal">Why Python for <span class="accent">Biomedical Data</span>?</h2>
-                <ul class="bullet-list">
-                    <li class="reveal"><strong>Free & Open Source</strong> — no license fees, unlike SAS or SPSS. Anyone can use it, anywhere.</li>
-                    <li class="reveal"><strong>Reproducible Research</strong> — scripted analysis that anyone can re-run. No more "which Excel cell did I click?"</li>
-                    <li class="reveal"><strong>Handles Real Data</strong> — Excel chokes on 1M rows. Pandas handles 100M+ rows and files like CSV, Excel, Parquet, SQL.</li>
-                    <li class="reveal"><strong>Rich Ecosystem</strong> — stats (SciPy), ML (scikit-learn), bioinformatics (Biopython), imaging (scikit-image). All in one language.</li>
-                    <li class="reveal"><strong>Industry Standard</strong> — used in NIH, Oxford, Nature-published research, and every major pharma company.</li>
-                </ul>
-            </section>
-
-            <!-- ========================================
-            SLIDE 5 — NUMPY
-            ======================================== -->
-            <section class="slide slide-content-slide" id="slide-5">
-                <div class="grid-pattern"></div>
-                <div class="slide-number reveal">03 / NumPy</div>
-                <h2 class="slide-heading reveal">NumPy — <span class="accent">The Foundation</span></h2>
-                <div class="two-col">
-                    <div class="col-left">
-                        <ul class="bullet-list">
-                            <li class="reveal"><strong>Arrays</strong> — fast, vectorized containers for numerical data. Think Excel column, but in memory.</li>
-                            <li class="reveal"><strong>No Loops Needed</strong> — operations apply to entire arrays at once. 10,000 patient readings? One line.</li>
-                            <li class="reveal"><strong>Built-in Stats</strong> — mean, median, std, percentiles. Critical for lab values, vitals, clinical measurements.</li>
-                        </ul>
-                    </div>
-                    <div class="col-right">
-                        <div class="code-mini reveal">
-                            <span class="kw">import</span> numpy <span class="kw">as</span> np<br><br>
-                            <span class="cmt"># 10,000 glucose readings</span><br>
-                            glucose = np.array([<span class="num">5.2</span>, <span class="num">4.8</span>, <span class="num">6.1</span>, ...])<br><br>
-                            <span class="cmt"># Stats in one line each</span><br>
-                            glucose.<span class="fn">mean</span>()   <span class="cmt"># average</span><br>
-                            glucose.<span class="fn">std</span>()    <span class="cmt"># variability</span><br>
-                            np.<span class="fn">percentile</span>(glucose, <span class="num">95</span>)
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ========================================
-            SLIDE 6 — PANDAS
-            ======================================== -->
-            <section class="slide slide-content-slide" id="slide-6">
-                <div class="grid-pattern"></div>
-                <div class="slide-number reveal">04 / Pandas</div>
-                <h2 class="slide-heading reveal">Pandas — <span class="accent">DataFrames</span></h2>
-                <div class="two-col">
-                    <div class="col-left">
-                        <ul class="bullet-list">
-                            <li class="reveal"><strong>DataFrame</strong> — 2D table with named columns. The central object in data analysis.</li>
-                            <li class="reveal"><strong>Read Anything</strong> — CSV, Excel, Parquet, SQL, JSON. Load from file or URL.</li>
-                            <li class="reveal"><strong>Filter & Group</strong> — SQL-like operations: filter rows, group by categories, aggregate.</li>
-                            <li class="reveal"><strong>Handle Dates</strong> — datetime parsing, extract year/month/day, time-series analysis.</li>
-                        </ul>
-                    </div>
-                    <div class="col-right">
-                        <div class="code-mini reveal">
-                            <span class="kw">import</span> pandas <span class="kw">as</span> pd<br><br>
-                            <span class="cmt"># Load directly from web</span><br>
-                            df = pd.<span class="fn">read_csv</span>(<span class="str">'url_to_data'</span>)<br><br>
-                            df.<span class="fn">head</span>()       <span class="cmt"># first rows</span><br>
-                            df.<span class="fn">describe</span>()   <span class="cmt"># summary stats</span><br>
-                            df.<span class="fn">groupby</span>(<span class="str">'year'</span>)[<span class="str">'births'</span>].<span class="fn">sum</span>()
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ========================================
-            SLIDE 7 — VISUALIZATION
-            ======================================== -->
-            <section class="slide slide-content-slide" id="slide-7">
-                <div class="grid-pattern"></div>
-                <div class="slide-number reveal">05 / Visualization</div>
-                <h2 class="slide-heading reveal">Matplotlib & <span class="accent">Seaborn</span></h2>
-                <div class="cards-row" style="margin-top: 16px;">
-                    <div class="feature-card reveal">
-                        <div class="feature-card-icon">📈</div>
-                        <div class="feature-card-title">Line Plots</div>
-                        <div class="feature-card-desc">Trends over time. Births per year, disease incidence, lab values over treatment course.</div>
-                    </div>
-                    <div class="feature-card reveal">
-                        <div class="feature-card-icon">📊</div>
-                        <div class="feature-card-title">Bar Charts</div>
-                        <div class="feature-card-desc">Compare categories. Births by month, drug efficacy by group, demographics.</div>
-                    </div>
-                    <div class="feature-card reveal">
-                        <div class="feature-card-icon">📦</div>
-                        <div class="feature-card-title">Box Plots</div>
-                        <div class="feature-card-desc">Show distributions. Compare decades, treatment arms, identify outliers.</div>
-                    </div>
-                    <div class="feature-card reveal">
-                        <div class="feature-card-icon">📉</div>
-                        <div class="feature-card-title">Histograms</div>
-                        <div class="feature-card-desc">Frequency distributions. Daily birth counts, patient ages, biomarker levels.</div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ========================================
-            SLIDE 8 — OUR DATASET
-            ======================================== -->
-            <section class="slide slide-content-slide" id="slide-8">
-                <div class="grid-pattern"></div>
-                <div class="slide-number reveal">06 / Dataset</div>
-                <h2 class="slide-heading reveal">Our Data: Malaysia <span class="accent">Daily Live Births</span></h2>
-                <div class="two-col">
-                    <div class="col-left">
-                        <ul class="bullet-list">
-                            <li class="reveal"><strong>Source</strong> — National Registration Department (JPN), via data.gov.my</li>
-                            <li class="reveal"><strong>Time Range</strong> — 1920 to 2023 (~38,000 rows)</li>
-                            <li class="reveal"><strong>Columns</strong> — date, state, births (3 columns, clean data)</li>
-                            <li class="reveal"><strong>Why Biomedical?</strong> — Birth demography underpins public health planning, maternal health policy, hospital staffing.</li>
-                            <li class="reveal"><strong>License</strong> — CC BY 4.0 (free to use, share, adapt)</li>
-                        </ul>
-                    </div>
-                    <div class="col-right">
-                        <div class="vis-block reveal">
-                            <div class="vis-block-inner">👶</div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ========================================
-            SLIDE 9 — HOW WE'LL WORK
-            ======================================== -->
-            <section class="slide slide-content-slide" id="slide-9">
-                <div class="grid-pattern"></div>
-                <div class="slide-number reveal">07 / Setup</div>
-                <h2 class="slide-heading reveal">How We'll <span class="accent">Work</span></h2>
-                <div class="cards-row" style="margin-top: 16px;">
-                    <div class="feature-card reveal">
-                        <div class="feature-card-icon">🌐</div>
-                        <div class="feature-card-title">Google Colab</div>
-                        <div class="feature-card-desc">No installation needed. Python, NumPy, Pandas, Matplotlib, and Seaborn all pre-installed. Runs in your browser.</div>
-                    </div>
-                    <div class="feature-card reveal">
-                        <div class="feature-card-icon">⌨️</div>
-                        <div class="feature-card-title">Code-Along</div>
-                        <div class="feature-card-desc">I'll type, you follow. Every line of code runs and produces output immediately. You'll leave with a working notebook.</div>
-                    </div>
-                    <div class="feature-card reveal">
-                        <div class="feature-card-icon">✏️</div>
-                        <div class="feature-card-title">Exercises</div>
-                        <div class="feature-card-desc">Short exercises after each section. Try it yourself, then we'll review together. No grades — just learning.</div>
-                    </div>
-                    <div class="feature-card reveal">
-                        <div class="feature-card-icon">💬</div>
-                        <div class="feature-card-title">Ask Anytime</div>
-                        <div class="feature-card-desc">Questions encouraged throughout. If something doesn't make sense, it probably doesn't make sense to others too.</div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ========================================
-            SLIDE 10 — KEY CONCEPTS
-            ======================================== -->
-            <section class="slide slide-content-slide" id="slide-10">
-                <div class="grid-pattern"></div>
-                <div class="slide-number reveal">08 / Recap</div>
-                <h2 class="slide-heading reveal">The <span class="accent">Big Picture</span></h2>
-                <div style="display: flex; gap: 60px; align-items: flex-start; margin-top: 20px;">
-                    <div class="stat-block" style="flex-direction: column; gap: 40px;">
-                        <div class="stat-item reveal">
-                            <div class="stat-value">NumPy</div>
-                            <div class="stat-label">Fast arrays & numerical computing</div>
-                        </div>
-                        <div class="stat-item reveal" style="margin-left: 60px;">
-                            <div class="stat-value" style="color: var(--accent-coral);">Pandas</div>
-                            <div class="stat-label">Data manipulation & analysis</div>
-                        </div>
-                        <div class="stat-item reveal" style="margin-left: 120px;">
-                            <div class="stat-value" style="color: var(--accent-gold);">Plots</div>
-                            <div class="stat-label">Matplotlib & Seaborn for visualization</div>
-                        </div>
-                    </div>
-                    <div style="flex: 1; display: flex; align-items: center; font-family: var(--font-body); font-size: 28px; color: var(--text-medium); font-style: italic; line-height: 1.6;" class="reveal">
-                        "Together, these three form the complete data analysis pipeline — from raw numbers to publication-ready figures."
-                    </div>
-                </div>
-            </section>
-
-            <!-- ========================================
-            SLIDE 11 — LET'S BEGIN
-            ======================================== -->
-            <section class="slide slide-closing" id="slide-11">
-                <div class="grid-pattern" style="width: 100%; height: 100%; opacity: 0.03;"></div>
-                <div class="closing-icon reveal">🚀</div>
-                <h2 class="closing-heading reveal">Let's Begin!</h2>
-                <p class="closing-sub reveal">Open your notebook. Let's write some Python.</p>
-                <div class="closing-url reveal">
-                    <a href="https://colab.research.google.com/github/hongvin/ai-in-medicine/blob/main/python_datascience_course.ipynb" target="_blank">Open in Google Colab</a>
-                </div>
-            </section>
-
-        </main><!-- /.deck-stage -->
-    </div><!-- /.deck-viewport -->
-
-    <!-- ============================================
-    DECK CONTROLS (outside the slide design system)
-    ============================================ -->
-    <div class="deck-controls">
-        <span class="page-counter" id="pageCounter">1 / 11</span>
+        <footer>
+            <a href="https://github.com/hongvin/ai-in-medicine" target="_blank">github.com/hongvin/ai-in-medicine</a>
+        </footer>
     </div>
-
-    <!-- ============================================
-    INLINE EDITING (default: hidden)
-    ============================================ -->
-    <div class="edit-hotzone" id="editHotzone"></div>
-    <button class="edit-toggle" id="editToggle" title="Edit mode (E)">&#9998;</button>
-
-    <!-- ============================================
-    SLIDE PRESENTATION CONTROLLER
-    ============================================ -->
-    <script>
-        class SlidePresentation {
-            constructor() {
-                this.slides = document.querySelectorAll('.slide');
-                this.totalSlides = this.slides.length;
-                this.currentSlide = 0;
-                this.stage = document.getElementById('deckStage');
-                this.counter = document.getElementById('pageCounter');
-
-                this.setupStageScale();
-                this.setupKeyboardNav();
-                this.setupWheelNav();
-                this.setupTouchNav();
-                this.setupInlineEditing();
-                this.showSlide(0);
-            }
-
-            /* ---- Stage scaling: fit 1920x1080 into viewport ---- */
-            setupStageScale() {
-                const scale = () => {
-                    const factor = Math.min(
-                        window.innerWidth / 1920,
-                        window.innerHeight / 1080
-                    );
-                    const x = (window.innerWidth - 1920 * factor) / 2;
-                    const y = (window.innerHeight - 1080 * factor) / 2;
-                    this.stage.style.transform = `translate(${x}px, ${y}px) scale(${factor})`;
-                };
-                scale();
-                window.addEventListener('resize', scale);
-            }
-
-            /* ---- Keyboard: arrows, space, home, end ---- */
-            setupKeyboardNav() {
-                document.addEventListener('keydown', (e) => {
-                    // Skip if user is editing text content
-                    if (e.target.getAttribute('contenteditable') === 'true') return;
-
-                    switch (e.key) {
-                        case 'ArrowRight':
-                        case 'ArrowDown':
-                        case ' ':
-                            e.preventDefault();
-                            this.nextSlide();
-                            break;
-                        case 'ArrowLeft':
-                        case 'ArrowUp':
-                            e.preventDefault();
-                            this.prevSlide();
-                            break;
-                        case 'Home':
-                            e.preventDefault();
-                            this.showSlide(0);
-                            break;
-                        case 'End':
-                            e.preventDefault();
-                            this.showSlide(this.totalSlides - 1);
-                            break;
-                    }
-                });
-            }
-
-            /* ---- Mouse wheel ---- */
-            setupWheelNav() {
-                let wheelTimeout;
-                document.addEventListener('wheel', (e) => {
-                    if (wheelTimeout) return;
-                    wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 600);
-
-                    if (e.deltaY > 20) {
-                        this.nextSlide();
-                    } else if (e.deltaY < -20) {
-                        this.prevSlide();
-                    }
-                }, { passive: true });
-            }
-
-            /* ---- Touch / swipe ---- */
-            setupTouchNav() {
-                let touchStartY = 0;
-                document.addEventListener('touchstart', (e) => {
-                    touchStartY = e.touches[0].clientY;
-                }, { passive: true });
-                document.addEventListener('touchend', (e) => {
-                    const deltaY = touchStartY - e.changedTouches[0].clientY;
-                    if (Math.abs(deltaY) > 50) {
-                        if (deltaY > 0) this.nextSlide();
-                        else this.prevSlide();
-                    }
-                });
-            }
-
-            /* ---- Inline editing (default included) ---- */
-            setupInlineEditing() {
-                this.isEditing = false;
-                const hotzone = document.getElementById('editHotzone');
-                const toggle = document.getElementById('editToggle');
-                let hideTimeout = null;
-
-                const showToggle = () => {
-                    clearTimeout(hideTimeout);
-                    toggle.classList.add('show');
-                };
-                const hideToggle = () => {
-                    hideTimeout = setTimeout(() => {
-                        if (!this.isEditing) toggle.classList.remove('show');
-                    }, 400);
-                };
-
-                hotzone.addEventListener('mouseenter', showToggle);
-                hotzone.addEventListener('mouseleave', hideToggle);
-                toggle.addEventListener('mouseenter', showToggle);
-                toggle.addEventListener('mouseleave', hideToggle);
-                toggle.addEventListener('click', () => this.toggleEditMode());
-                hotzone.addEventListener('click', () => this.toggleEditMode());
-
-                document.addEventListener('keydown', (e) => {
-                    if ((e.key === 'e' || e.key === 'E') &&
-                        !e.target.getAttribute('contenteditable') &&
-                        !e.target.closest('input, textarea, select')) {
-                        this.toggleEditMode();
-                    }
-                    // Ctrl+S to save editing
-                    if ((e.ctrlKey || e.metaKey) && e.key === 's' && this.isEditing) {
-                        e.preventDefault();
-                        this.saveEditState();
-                    }
-                });
-            }
-
-            toggleEditMode() {
-                this.isEditing = !this.isEditing;
-                const toggle = document.getElementById('editToggle');
-                toggle.classList.toggle('active', this.isEditing);
-
-                const editable = this.slides[this.currentSlide].querySelectorAll(
-                    'h1, h2, p, li, div[contenteditable], span:not(.title-meta-dot):not(.agenda-num):not(.kw):not(.fn):not(.str):not(.num):not(.cmt)'
-                );
-                editable.forEach(el => {
-                    if (this.isEditing) {
-                        // Only make direct text containers editable
-                        if (el.children.length === 0 || el.querySelector('strong')) {
-                            el.setAttribute('contenteditable', 'true');
-                        }
-                    } else {
-                        el.removeAttribute('contenteditable');
-                    }
-                });
-
-                // Restore saved state on cancel, or save on apply
-                if (!this.isEditing) {
-                    this.loadEditState();
-                }
-                this.saveEditState(); // snapshot before editing
-            }
-
-            saveEditState() {
-                const content = {};
-                const editable = document.querySelectorAll('[contenteditable="true"]');
-                editable.forEach((el, i) => {
-                    content[i] = el.innerHTML;
-                });
-                localStorage.setItem('slide-edit-backup', JSON.stringify(content));
-            }
-
-            loadEditState() {
-                const saved = localStorage.getItem('slide-edit-backup');
-                if (!saved) return;
-                const content = JSON.parse(saved);
-                const editable = document.querySelectorAll('[contenteditable="true"]');
-                editable.forEach((el, i) => {
-                    if (content[i] !== undefined) {
-                        el.innerHTML = content[i];
-                    }
-                });
-            }
-
-            /* ---- Navigation ---- */
-            nextSlide() {
-                if (this.currentSlide < this.totalSlides - 1) {
-                    this.showSlide(this.currentSlide + 1);
-                }
-            }
-
-            prevSlide() {
-                if (this.currentSlide > 0) {
-                    this.showSlide(this.currentSlide - 1);
-                }
-            }
-
-            showSlide(index) {
-                this.currentSlide = Math.max(0, Math.min(index, this.totalSlides - 1));
-                this.slides.forEach((slide, i) => {
-                    const isActive = i === this.currentSlide;
-                    slide.classList.toggle('active', isActive);
-                    slide.classList.toggle('visible', isActive);
-                });
-                // Update page counter
-                this.counter.textContent = `${this.currentSlide + 1} / ${this.totalSlides}`;
-            }
-        }
-
-        // Boot
-        new SlidePresentation();
-    </script>
-
 </body>
 </html>

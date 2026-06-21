@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI in Medicine — Conventional Machine Learning</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-cream: #f9f7f4;
+            --bg-warm: #f3f0eb;
+            --text-dark: #1e293b;
+            --text-medium: #475569;
+            --text-light: #94a3b8;
+            --accent: #e76f51;
+            --accent-subtle: rgba(231, 111, 81, 0.08);
+            --accent-secondary: #0d9488;
+            --white: #ffffff;
+            --border-subtle: rgba(30, 41, 59, 0.08);
+            --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Source Serif 4', Georgia, serif;
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.7s;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* Fixed 16:9 stage */
+        html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--bg-cream); }
+        .deck-viewport { position: fixed; inset: 0; overflow: hidden; background: var(--bg-cream); }
+        .deck-stage {
+            position: absolute; left: 0; top: 0;
+            width: 1920px; height: 1080px; overflow: hidden;
+            transform-origin: 0 0; background: var(--bg-cream);
+        }
+        .slide {
+            position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden;
+            display: block; visibility: hidden; opacity: 0; pointer-events: none;
+            background: var(--bg-cream);
+        }
+        .slide.active, .slide.visible { visibility: visible; opacity: 1; pointer-events: auto; z-index: 1; }
+        img, video, canvas, svg { max-width: 100%; max-height: 100%; }
+        .deck-controls { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 1000; }
+
+        @media print {
+            html, body { width: 1920px; height: auto; overflow: visible; background: #fff; }
+            .deck-viewport { position: static; overflow: visible; background: #fff; }
+            .deck-stage { position: static; width: auto; height: auto; transform: none !important; background: none; }
+            .slide { position: relative; display: block !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; width: 1920px; height: 1080px; break-after: page; page-break-after: always; }
+            .slide:last-child { break-after: auto; page-break-after: auto; }
+            .deck-controls { display: none !important; }
+        }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; } }
+
+        .reveal { opacity: 0; transform: translateY(32px); transition: opacity var(--duration-normal) var(--ease-out-expo), transform var(--duration-normal) var(--ease-out-expo); }
+        .slide.visible .reveal { opacity: 1; transform: translateY(0); }
+        .reveal:nth-child(1) { transition-delay: 0.05s; } .reveal:nth-child(2) { transition-delay: 0.12s; }
+        .reveal:nth-child(3) { transition-delay: 0.19s; } .reveal:nth-child(4) { transition-delay: 0.26s; }
+        .reveal:nth-child(5) { transition-delay: 0.33s; } .reveal:nth-child(6) { transition-delay: 0.40s; }
+        .reveal:nth-child(7) { transition-delay: 0.47s; } .reveal:nth-child(8) { transition-delay: 0.54s; }
+
+        /* Title Slide */
+        .slide-title { display: flex; align-items: center; padding: 0 160px; background: linear-gradient(135deg, #f9f7f4 0%, #f3f0eb 30%, #f9f7f4 60%, #f0ece6 100%); }
+        .title-accent-bar { position: absolute; left: 0; top: 0; width: 8px; height: 100%; background: linear-gradient(180deg, var(--accent), #d65d3d, var(--accent)); }
+        .title-badge { display: inline-block; font-family: var(--font-display); font-size: 16px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); background: var(--accent-subtle); padding: 8px 20px; border-radius: 4px; margin-bottom: 32px; }
+        .title-main { font-family: var(--font-display); font-size: 96px; font-weight: 800; line-height: 1.05; color: var(--text-dark); letter-spacing: -0.02em; max-width: 1200px; }
+        .title-sub { font-family: var(--font-body); font-size: 34px; font-weight: 400; color: var(--text-medium); line-height: 1.4; margin-top: 24px; font-style: italic; }
+        .title-meta { display: flex; gap: 40px; margin-top: 48px; font-family: var(--font-display); font-size: 18px; font-weight: 500; color: var(--text-light); letter-spacing: 0.05em; }
+        .title-meta span { display: flex; align-items: center; gap: 10px; }
+        .title-meta-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+        /* Content slides */
+        .slide-content-slide { display: flex; flex-direction: column; padding: 100px 160px 80px; }
+        .slide-number { font-family: var(--font-display); font-size: 14px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+        .slide-heading { font-family: var(--font-display); font-size: 64px; font-weight: 700; color: var(--text-dark); letter-spacing: -0.015em; line-height: 1.1; margin-bottom: 48px; }
+        .slide-heading .accent { color: var(--accent); }
+
+        /* Cards */
+        .cards-row { display: flex; gap: 32px; max-width: 1520px; }
+        .feature-card { flex: 1; background: var(--white); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 40px 36px; box-shadow: var(--shadow-card); }
+        .feature-card-icon { font-size: 40px; margin-bottom: 20px; line-height: 1; }
+        .feature-card-title { font-family: var(--font-display); font-size: 24px; font-weight: 600; color: var(--text-dark); margin-bottom: 12px; }
+        .feature-card-desc { font-family: var(--font-body); font-size: 18px; color: var(--text-medium); line-height: 1.5; }
+
+        /* Bullet list */
+        .bullet-list { list-style: none; font-family: var(--font-body); font-size: 24px; color: var(--text-medium); line-height: 1.8; max-width: 1100px; }
+        .bullet-list li { padding-left: 36px; position: relative; margin-bottom: 16px; }
+        .bullet-list li::before { content: ''; position: absolute; left: 0; top: 14px; width: 14px; height: 14px; border-radius: 3px; background: var(--accent); opacity: 0.6; }
+        .bullet-list li strong { font-family: var(--font-display); color: var(--text-dark); font-weight: 600; }
+
+        /* Two-col */
+        .two-col { display: flex; gap: 80px; max-width: 1520px; }
+        .col-left, .col-right { flex: 1; }
+        .col-right { display: flex; align-items: center; justify-content: center; }
+
+        /* Code block */
+        .code-mini { font-family: 'JetBrains Mono', 'Consolas', monospace; background: #1e293b; color: #e2e8f0; padding: 32px 36px; border-radius: 8px; font-size: 20px; line-height: 1.7; margin-top: 32px; max-width: 1100px; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+        .code-mini .kw { color: #93c5fd; } .code-mini .fn { color: #f9a8d4; } .code-mini .str { color: #86efac; } .code-mini .num { color: #fdba74; } .code-mini .cmt { color: #64748b; }
+
+        /* Stats */
+        .stat-block { display: flex; gap: 80px; margin-top: 24px; }
+        .stat-item { display: flex; flex-direction: column; }
+        .stat-value { font-family: var(--font-display); font-size: 72px; font-weight: 800; color: var(--accent); line-height: 1; }
+        .stat-label { font-family: var(--font-body); font-size: 20px; color: var(--text-medium); margin-top: 8px; font-style: italic; }
+
+        /* Closing */
+        .slide-closing { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: linear-gradient(135deg, #f0ece6 0%, #f9f7f4 40%, #f3f0eb 70%, #f9f7f4 100%); }
+        .closing-icon { font-size: 80px; margin-bottom: 40px; opacity: 0.9; }
+        .closing-heading { font-family: var(--font-display); font-size: 80px; font-weight: 800; color: var(--text-dark); letter-spacing: -0.02em; }
+        .closing-sub { font-family: var(--font-body); font-size: 30px; color: var(--text-medium); font-style: italic; margin-top: 20px; }
+        .closing-url { font-family: var(--font-display); font-size: 22px; margin-top: 48px; letter-spacing: 0.04em; }
+        .closing-url a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(231,111,81,0.3); transition: border-color 0.2s; }
+        .closing-url a:hover { border-bottom-color: var(--accent); }
+
+        /* Grid pattern */
+        .grid-pattern { position: absolute; right: 0; bottom: 0; width: 400px; height: 400px; opacity: 0.04; background-image: linear-gradient(var(--accent) 1px, transparent 1px), linear-gradient(90deg, var(--accent) 1px, transparent 1px); background-size: 40px 40px; }
+
+        .page-counter { font-family: var(--font-display); font-size: 14px; font-weight: 500; color: var(--text-light); letter-spacing: 0.08em; background: var(--white); padding: 8px 18px; border-radius: 20px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-card); }
+    </style>
+</head>
+<body>
+    <div class="deck-viewport" id="deckViewport">
+        <main class="deck-stage" id="deckStage">
+
+            <!-- SLIDE 1 — TITLE -->
+            <section class="slide slide-title active" id="slide-1">
+                <div class="title-accent-bar"></div>
+                <div class="grid-pattern"></div>
+                <div>
+                    <div class="title-badge reveal">AI in Medicine — Summer Course 2026</div>
+                    <h1 class="title-main reveal">Conventional<br>Machine Learning</h1>
+                    <p class="title-sub reveal">Build, evaluate, and interpret ML models for biomedical data —<br>from logistic regression to random forests in one session</p>
+                    <div class="title-meta reveal">
+                        <span><span class="title-meta-dot"></span> 27 July 2026</span>
+                        <span><span class="title-meta-dot"></span> 1400–1715</span>
+                        <span><span class="title-meta-dot"></span> Google Colab</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 2 — WHAT IS ML -->
+            <section class="slide slide-content-slide" id="slide-2">
+                <div class="grid-pattern"></div>
+                <div class="slide-number reveal">01 / Concept</div>
+                <h2 class="slide-heading reveal">What is <span class="accent">Machine Learning</span>?</h2>
+                <ul class="bullet-list">
+                    <li class="reveal"><strong>Algorithms that learn from data</strong> — instead of being explicitly programmed with rules</li>
+                    <li class="reveal"><strong>Classification</strong> — predict a category (malignant vs benign tumor)</li>
+                    <li class="reveal"><strong>Regression</strong> — predict a number (disease progression score)</li>
+                    <li class="reveal"><strong>Supervised learning</strong> — we have labeled examples to learn from. Both classification and regression are supervised.</li>
+                    <li class="reveal"><strong>The golden rule</strong> — never evaluate on training data. Always hold out a test set.</li>
+                </ul>
+            </section>
+
+            <!-- SLIDE 3 — SCIKIT-LEARN -->
+            <section class="slide slide-content-slide" id="slide-3">
+                <div class="grid-pattern"></div>
+                <div class="slide-number reveal">02 / scikit-learn</div>
+                <h2 class="slide-heading reveal">scikit-learn — <span class="accent">The ML Workhorse</span></h2>
+                <div class="two-col">
+                    <div class="col-left">
+                        <ul class="bullet-list">
+                            <li class="reveal"><strong>One API pattern</strong> — every model follows fit() → predict()</li>
+                            <li class="reveal"><strong>Dozens of algorithms</strong> — logistic regression, decision trees, random forests, SVM, k-NN</li>
+                            <li class="reveal"><strong>Built-in evaluation</strong> — accuracy, precision, recall, ROC curves, confusion matrices</li>
+                            <li class="reveal"><strong>Preprocessing tools</strong> — scaling, encoding, imputation, feature selection</li>
+                        </ul>
+                    </div>
+                    <div class="col-right">
+                        <div class="code-mini reveal">
+                            <span class="cmt"># The 4-step recipe</span><br>
+                            <span class="kw">from</span> sklearn <span class="kw">import</span> SomeModel<br><br>
+                            model = SomeModel()<br>
+                            model.<span class="fn">fit</span>(X_train, y_train)<br>
+                            preds = model.<span class="fn">predict</span>(X_test)
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 4 — CLASSIFICATION -->
+            <section class="slide slide-content-slide" id="slide-4">
+                <div class="grid-pattern"></div>
+                <div class="slide-number reveal">03 / Classification</div>
+                <h2 class="slide-heading reveal"><span class="accent">Logistic Regression</span> — Your First Model</h2>
+                <ul class="bullet-list">
+                    <li class="reveal"><strong>Despite the name</strong> — logistic regression is a classification algorithm</li>
+                    <li class="reveal"><strong>Outputs a probability</strong> — "89% chance this tumor is malignant"</li>
+                    <li class="reveal"><strong>Fast, interpretable, and often excellent</strong> — always try it first</li>
+                    <li class="reveal"><strong>Dataset: Breast Cancer Wisconsin</strong> — 569 samples, 30 cell-nuclei features → predict malignant vs benign</li>
+                </ul>
+            </section>
+
+            <!-- SLIDE 5 — EVALUATION -->
+            <section class="slide slide-content-slide" id="slide-5">
+                <div class="grid-pattern"></div>
+                <div class="slide-number reveal">04 / Evaluation</div>
+                <h2 class="slide-heading reveal">Is Our Model <span class="accent">Any Good</span>?</h2>
+                <div class="cards-row" style="margin-top: 16px;">
+                    <div class="feature-card reveal">
+                        <div class="feature-card-icon">🎯</div>
+                        <div class="feature-card-title">Confusion Matrix</div>
+                        <div class="feature-card-desc">Shows exactly where errors happen. False negatives (missed cancers) vs false positives (false alarms).</div>
+                    </div>
+                    <div class="feature-card reveal">
+                        <div class="feature-card-icon">📈</div>
+                        <div class="feature-card-title">ROC Curve & AUC</div>
+                        <div class="feature-card-desc">Tradeoff between sensitivity and specificity at every threshold. AUC = 1.0 is perfect; 0.5 is random.</div>
+                    </div>
+                    <div class="feature-card reveal">
+                        <div class="feature-card-icon">⚖️</div>
+                        <div class="feature-card-title">Precision & Recall</div>
+                        <div class="feature-card-desc">Precision: of predicted positives, how many are real?<br>Recall: of real positives, how many did we catch?</div>
+                    </div>
+                    <div class="feature-card reveal">
+                        <div class="feature-card-icon">🔬</div>
+                        <div class="feature-card-title">Clinical Context</div>
+                        <div class="feature-card-desc">In cancer screening, recall > precision. Missing a cancer (false negative) is far worse than a false alarm.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 6 — TREES & FOREST -->
+            <section class="slide slide-content-slide" id="slide-6">
+                <div class="grid-pattern"></div>
+                <div class="slide-number reveal">05 / Trees</div>
+                <h2 class="slide-heading reveal">Decision Trees & <span class="accent">Random Forest</span></h2>
+                <div class="two-col">
+                    <div class="col-left">
+                        <ul class="bullet-list">
+                            <li class="reveal"><strong>Decision Tree</strong> — flowchart-like model. Splits data by asking yes/no questions about features. Fully interpretable.</li>
+                            <li class="reveal"><strong>Random Forest</strong> — an ensemble of 100+ decision trees, each trained on a random subset. Averages predictions → more robust.</li>
+                            <li class="reveal"><strong>Feature importance</strong> — random forests tell you which features matter most. Vital for biomedical insight.</li>
+                        </ul>
+                    </div>
+                    <div class="col-right">
+                        <div class="code-mini reveal">
+                            <span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier<br><br>
+                            rf = RandomForestClassifier(<br>
+                            &nbsp;&nbsp;n_estimators=<span class="num">100</span>,<br>
+                            &nbsp;&nbsp;max_depth=<span class="num">5</span><br>
+                            )<br>
+                            rf.<span class="fn">fit</span>(X_train, y_train)<br><br>
+                            <span class="cmt"># Which features matter?</span><br>
+                            rf.feature_importances_
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 7 — REGRESSION -->
+            <section class="slide slide-content-slide" id="slide-7">
+                <div class="grid-pattern"></div>
+                <div class="slide-number reveal">06 / Regression</div>
+                <h2 class="slide-heading reveal">Linear Regression — <span class="accent">Predict a Number</span></h2>
+                <ul class="bullet-list">
+                    <li class="reveal"><strong>Dataset: Diabetes</strong> — 442 patients, 10 baseline variables → predict disease progression after 1 year</li>
+                    <li class="reveal"><strong>R² (R-squared)</strong> — what fraction of variance does your model explain? 0 = useless, 1 = perfect</li>
+                    <li class="reveal"><strong>Coefficients</strong> — each feature has a weight. Positive = increases prediction, negative = decreases it</li>
+                    <li class="reveal"><strong>Clinical insight</strong> — BMI and blood pressure are the strongest predictors. This matches clinical knowledge → builds trust.</li>
+                </ul>
+            </section>
+
+            <!-- SLIDE 8 — DATASETS -->
+            <section class="slide slide-content-slide" id="slide-8">
+                <div class="grid-pattern"></div>
+                <div class="slide-number reveal">07 / Datasets</div>
+                <h2 class="slide-heading reveal">Our <span class="accent">Biomedical</span> Datasets</h2>
+                <div class="cards-row" style="margin-top: 16px;">
+                    <div class="feature-card reveal">
+                        <div class="feature-card-icon">🔬</div>
+                        <div class="feature-card-title">Breast Cancer Wisconsin</div>
+                        <div class="feature-card-desc">569 samples, 30 features from cell nuclei images. Predict malignant vs benign. The classic biomedical ML benchmark.</div>
+                    </div>
+                    <div class="feature-card reveal">
+                        <div class="feature-card-icon">💉</div>
+                        <div class="feature-card-title">Diabetes Dataset</div>
+                        <div class="feature-card-desc">442 patients, 10 baseline variables (BMI, BP, blood serum). Predict disease progression 1 year later. Real clinical data.</div>
+                    </div>
+                    <div class="feature-card reveal">
+                        <div class="feature-card-icon">📦</div>
+                        <div class="feature-card-title">Built into scikit-learn</div>
+                        <div class="feature-card-desc">Both datasets come pre-installed with scikit-learn. One line of code loads them — no downloading, no cleaning needed.</div>
+                    </div>
+                    <div class="feature-card reveal">
+                        <div class="feature-card-icon">🏥</div>
+                        <div class="feature-card-title">Why These Matter</div>
+                        <div class="feature-card-desc">These are the same datasets used in ML textbooks and research papers worldwide. You're learning on real, published data.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 9 — HOW WE'LL WORK -->
+            <section class="slide slide-content-slide" id="slide-9">
+                <div class="grid-pattern"></div>
+                <div class="slide-number reveal">08 / Setup</div>
+                <h2 class="slide-heading reveal">How We'll <span class="accent">Work</span></h2>
+                <div class="cards-row" style="margin-top: 16px;">
+                    <div class="feature-card reveal">
+                        <div class="feature-card-icon">🌐</div>
+                        <div class="feature-card-title">Google Colab</div>
+                        <div class="feature-card-desc">No installation. scikit-learn, NumPy, Pandas, and Matplotlib all pre-installed. Runs in your browser.</div>
+                    </div>
+                    <div class="feature-card reveal">
+                        <div class="feature-card-icon">⌨️</div>
+                        <div class="feature-card-title">Code-Along</div>
+                        <div class="feature-card-desc">I'll type, you follow. Every cell runs. You'll see models train in real time and predictions appear immediately.</div>
+                    </div>
+                    <div class="feature-card reveal">
+                        <div class="feature-card-icon">✏️</div>
+                        <div class="feature-card-title">Exercises</div>
+                        <div class="feature-card-desc">Build your own models. Compare algorithms. Decide which model you'd trust in a clinical setting.</div>
+                    </div>
+                    <div class="feature-card reveal">
+                        <div class="feature-card-icon">💬</div>
+                        <div class="feature-card-title">Ask Anytime</div>
+                        <div class="feature-card-desc">ML has jargon — if a term doesn't make sense, ask. Chances are others have the same question.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 10 — KEY CONCEPTS -->
+            <section class="slide slide-content-slide" id="slide-10">
+                <div class="grid-pattern"></div>
+                <div class="slide-number reveal">09 / Recap</div>
+                <h2 class="slide-heading reveal">The <span class="accent">ML Pipeline</span></h2>
+                <div style="display: flex; gap: 60px; align-items: flex-start; margin-top: 20px;">
+                    <div class="stat-block" style="flex-direction: column; gap: 40px;">
+                        <div class="stat-item reveal">
+                            <div class="stat-value">Split</div>
+                            <div class="stat-label">Train/test before anything else</div>
+                        </div>
+                        <div class="stat-item reveal" style="margin-left: 60px;">
+                            <div class="stat-value" style="color: var(--accent-secondary);">Fit</div>
+                            <div class="stat-label">model.fit(X_train, y_train)</div>
+                        </div>
+                        <div class="stat-item reveal" style="margin-left: 120px;">
+                            <div class="stat-value" style="color: #ca8a04;">Evaluate</div>
+                            <div class="stat-label">Confusion matrix, ROC, precision, recall</div>
+                        </div>
+                    </div>
+                    <div style="flex: 1; display: flex; align-items: center; font-family: var(--font-body); font-size: 28px; color: var(--text-medium); font-style: italic; line-height: 1.6;" class="reveal">
+                        "Every ML pipeline is the same: split → fit → predict → evaluate. Master this pattern and you can use any algorithm."
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 11 — LET'S BEGIN -->
+            <section class="slide slide-closing" id="slide-11">
+                <div class="grid-pattern" style="width: 100%; height: 100%; opacity: 0.03;"></div>
+                <div class="closing-icon reveal">🤖</div>
+                <h2 class="closing-heading reveal">Let's Build Models!</h2>
+                <p class="closing-sub reveal">Open your notebook. Time to train your first classifier.</p>
+                <div class="closing-url reveal">
+                    <a href="https://colab.research.google.com/github/hongvin/ai-in-medicine/blob/main/ml_course.ipynb" target="_blank">Open in Google Colab</a>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <div class="deck-controls">
+        <span class="page-counter" id="pageCounter">1 / 11</span>
+    </div>
+
+    <script>
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.totalSlides = this.slides.length;
+                this.currentSlide = 0;
+                this.stage = document.getElementById('deckStage');
+                this.counter = document.getElementById('pageCounter');
+                this.setupStageScale();
+                this.setupKeyboardNav();
+                this.setupWheelNav();
+                this.setupTouchNav();
+                this.showSlide(0);
+            }
+            setupStageScale() {
+                const scale = () => {
+                    const factor = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+                    const x = (window.innerWidth - 1920 * factor) / 2;
+                    const y = (window.innerHeight - 1080 * factor) / 2;
+                    this.stage.style.transform = `translate(${x}px, ${y}px) scale(${factor})`;
+                };
+                scale();
+                window.addEventListener('resize', scale);
+            }
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.target.getAttribute('contenteditable') === 'true') return;
+                    switch (e.key) {
+                        case 'ArrowRight': case 'ArrowDown': case ' ': e.preventDefault(); this.nextSlide(); break;
+                        case 'ArrowLeft': case 'ArrowUp': e.preventDefault(); this.prevSlide(); break;
+                        case 'Home': e.preventDefault(); this.showSlide(0); break;
+                        case 'End': e.preventDefault(); this.showSlide(this.totalSlides - 1); break;
+                    }
+                });
+            }
+            setupWheelNav() {
+                let wheelTimeout;
+                document.addEventListener('wheel', (e) => {
+                    if (wheelTimeout) return;
+                    wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 600);
+                    if (e.deltaY > 20) this.nextSlide();
+                    else if (e.deltaY < -20) this.prevSlide();
+                }, { passive: true });
+            }
+            setupTouchNav() {
+                let touchStartY = 0;
+                document.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; }, { passive: true });
+                document.addEventListener('touchend', (e) => {
+                    const deltaY = touchStartY - e.changedTouches[0].clientY;
+                    if (Math.abs(deltaY) > 50) { if (deltaY > 0) this.nextSlide(); else this.prevSlide(); }
+                });
+            }
+            nextSlide() { if (this.currentSlide < this.totalSlides - 1) this.showSlide(this.currentSlide + 1); }
+            prevSlide() { if (this.currentSlide > 0) this.showSlide(this.currentSlide - 1); }
+            showSlide(index) {
+                this.currentSlide = Math.max(0, Math.min(index, this.totalSlides - 1));
+                this.slides.forEach((slide, i) => {
+                    const isActive = i === this.currentSlide;
+                    slide.classList.toggle('active', isActive);
+                    slide.classList.toggle('visible', isActive);
+                });
+                this.counter.textContent = `${this.currentSlide + 1} / ${this.totalSlides}`;
+            }
+        }
+        new SlidePresentation();
+    </script>
+</body>
+</html>
